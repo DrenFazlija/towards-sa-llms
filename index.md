@@ -50,10 +50,9 @@ First, we theoretically ground Sensitivity Awareness (SA) in the theory of Diffe
 
 - We connect **SA** to **Attribute Inference (AI)** by showing SA is effectively a post-processed version of AI (since RBAC-guarding is post-processing), implying:
 
-    ```math
-    Adv_{SA}(\mathcal{A}) \leq Adv_{AI}(\mathcal{A}) \text{ for any adversary } \mathcal{A}
-    ```
-
+<p align="center">
+    $$Adv_{SA}(\mathcal{A}) \leq Adv_{AI}(\mathcal{A}) \text{ for any adversary } \mathcal{A}$$
+</p>
 - We establish an **unavoidable lower bound on leakage** driven by statistical correlations between non-sensitive context $\varphi(z)$ and sensitive attributes $\pi(z)$ &mdash; even *perfect* mechanisms cannot remove what can be inferred from correlations alone.
 
 - Based on these connections, we derive a **DP-based upper bound** on SA leakage:  
