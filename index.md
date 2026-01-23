@@ -1,7 +1,7 @@
 # Towards Sensitivity-Aware Language Models
 
 [![license badge](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![GitHub](https://img.shields.io/badge/Code-Work%20in%20Progress!-orange?logo=github)](https://github.com/DrenFazlija/Scooter)
+[![GitHub](https://img.shields.io/badge/Code-Work%20in%20Progress!-orange?logo=github)](https://github.com/DrenFazlija/towards-sa-llms)
 ![Dataset](https://img.shields.io/badge/Dataset-Coming%20Soon-%231682D4?logo=zenodo)
 ![Hugginface](https://img.shields.io/badge/Dataset-Coming%20Soon-%23FFD21E?logo=huggingface)
 
@@ -48,15 +48,12 @@ First, we theoretically ground Sensitivity Awareness (SA) in the theory of Diffe
 ## Theoretical Contributions
 - We formalize **Sensitivity Awareness** as a _privacy game_ that captures unauthorized disclosure in enterprise settings (**role-based access control / RBAC**), making leakage measurable via an adversary’s success rate.
 
-- We connect **SA** to **Attribute Inference (AI)** by showing SA is effectively a post-processed version of AI (since RBAC-guarding is post-processing), implying:
-
-<p align="center">
-    $$Adv_{SA}(\mathcal{A}) \leq Adv_{AI}(\mathcal{A}) \text{ for any adversary } \mathcal{A}$$
-</p>
-- We establish an **unavoidable lower bound on leakage** driven by statistical correlations between non-sensitive context $\varphi(z)$ and sensitive attributes $\pi(z)$ &mdash; even *perfect* mechanisms cannot remove what can be inferred from correlations alone.
+- We connect **SA** to **Attribute Inference (AI)** by showing SA is effectively a post-processed version of AI (since RBAC-guarding is post-processing)
+  
+- We establish an **unavoidable lower bound on leakage** driven by statistical correlations between non-sensitive context and sensitive attributes – even *perfect* mechanisms cannot remove what can be inferred from correlations alone.
 
 - Based on these connections, we derive a **DP-based upper bound** on SA leakage:  
-  If training is $(\varepsilon, \delta)$-differentially private, then any SA/AI adversary’s advantage is bounded by a function of $(\varepsilon, \delta)$, grounding SA guarantees in **DP theory**.
+  If training is (ε, δ)-differentially private, then any SA/AI adversary’s advantage is bounded by a function of (ε, δ), grounding SA guarantees in **DP theory**.
 
 - Essentially, we can interpret **SA as _policy-scoped DP_**: rather than indistinguishability across all users, outputs should be indistinguishable *within equivalence classes* of users with the same access rights, aligning privacy guarantees with access-control policy.
 
