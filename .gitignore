@@ -1,4 +1,7 @@
 qwen3_8b_4bit/
 qwen3_14b_4bit/
 processed_dataset.csv
-newer_readme.md
+*.sh
+slurm-*.out
+trainer_output*
+unsloth_compiled_cache*

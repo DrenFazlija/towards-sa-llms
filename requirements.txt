@@ -1,0 +1,7 @@
+datasets==3.6.0
+pandas==3.0.0
+torch==2.7.1
+tqdm==4.67.1
+transformers==4.53.3
+trl==0.19.1
+unsloth==2025.7.8

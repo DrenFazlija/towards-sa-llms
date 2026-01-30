@@ -12,17 +12,18 @@ This repository contains the scripts for fine-tuning and running inference with 
 
 ### Setting up the Conda Environment
 
-Create and activate the conda environment from the provided `unsloth_env.yml` file:
-
-```bash
-conda env create -f unsloth_env.yml
-conda activate unsloth
+**1. Create Conda Environment**
+```bash 
+conda create -n sallms python=3.11.13
 ```
 
-The environment includes:
-- Python 3.11.13
-- All required packages: `unsloth`, `torch`, `pandas`, `transformers`, `trl`, `datasets`, `tqdm`, and other dependencies
-- CUDA-enabled PyTorch and related libraries
+**2. Activate Conda Environment and Install Packages**
+```bash
+cd towards-sa-llms # Change to the Repository Directory
+conda activate sallms
+conda install pip # necessary for some conda versions
+pip install -r requirements.txt
+```
 
 ## Scripts
 
@@ -32,6 +33,8 @@ This script fine-tunes a Qwen3 model using LoRA (Low-Rank Adaptation) on a proce
 
 #### Requirements
 - `processed_dataset.csv` must exist in the working directory with a `text` column
+- Please download the csv-file from the following Zenodo repository: https://doi.org/10.5281/zenodo.18412000
+
 
 #### Usage
 
@@ -203,7 +206,7 @@ The model name is automatically constructed based on:
 ## Example Workflow
 
 1. **Training data (`processed_dataset.csv`)**
-   - The `processed_dataset.csv` in this repository is already prepared and ready to use. It builds upon the original data from the ACCESS DENIED INC experiments and contains the correct outputs of the models assessed in the original paper.
+   - The `processed_dataset.csv` in our [Zenodo repository](https://doi.org/10.5281/zenodo.18412000) is already prepared and ready to use. It builds upon the original data from the ACCESS DENIED INC experiments and contains the correct outputs of the models assessed in the original paper.
    - **Data composition**: Roughly 75% of the examples are chain-of-thought (CoT) outputs and the remaining 25% are non-CoT outputs.
 
 2. **Fine-tune the model:**
