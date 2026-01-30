@@ -3,7 +3,7 @@
 [![license badge](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub](https://img.shields.io/badge/Code-Work%20in%20Progress!-orange?logo=github)](https://github.com/DrenFazlija/towards-sa-llms)
 [![Dataset](https://img.shields.io/badge/Dataset-10.5281/zenodo.18412000-%231682D4?logo=zenodo)](https://doi.org/10.5281/zenodo.18412000)
-![Hugginface](https://img.shields.io/badge/Adapters-Coming%20Soon-%23FFD21E?logo=huggingface)
+[![Huggingface](https://img.shields.io/badge/Adapters-SisWiss/qwen3--{8,14}b--sa--lora-%23FFD21E?logo=huggingface)](https://huggingface.co/SisWiss)
 [![arXiv](https://img.shields.io/badge/Preprint-2601.20901-%23B31B1B?logo=arxiv)](https://arxiv.org/abs/2601.20901)
 
 

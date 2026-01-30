@@ -89,117 +89,151 @@ python qwen3_finetuning_vldb.py --resume_from_checkpoint
 
 ### 2. Inference: `unsloth_adi.py`
 
-This script runs batch inference on a pre-prepared test dataset using a fine-tuned or base model.
+This script runs batch inference on a pre-prepared ADI test dataset using either:
+- a **base model**, or
+- a **base model + LoRA adapter** (local folder **or** public Hugging Face Hub repo), or
+- a **full checkpoint directory** (if you have one).
+
+> **Scope note:** The released LoRA adapters are specialized for the **ADI toy environment** and should not be interpreted as general-purpose “enterprise security” models.
 
 #### Requirements
 - Test CSV file must be prepared beforehand with columns: `id` and `input`
-- The input CSV should use ASCII character 30 (Record Separator) as the delimiter
-- Input format should include `----- USER QUERY -----` markers for query extraction
+- The input CSV must use ASCII character 30 (Record Separator) as the delimiter
+- The input format should include `----- USER QUERY -----` markers for query extraction
 
-#### Pre-existing Adapter Directories
+#### Public LoRA adapters (Hugging Face Hub)
 
-This repository includes two pre-trained LoRA adapter directories:
-- `qwen3_8b_4bit/`: Pre-trained adapter for Qwen3-8B model
-- `qwen3_14b_4bit/`: Pre-trained adapter for Qwen3-14B model
+Pre-trained adapters are hosted on the HF Hub and can be loaded directly:
 
-These can be used directly with the `--adapter_dir` argument for inference without additional fine-tuning.
+- **Qwen3-8B (4-bit base):** `SisWiss/qwen3-8b-sa-lora`
+- **Qwen3-14B (4-bit base):** `SisWiss/qwen3-14b-sa-lora`
+
 
 #### Usage
 
-**Basic usage with base model:**
+**A) Basic usage (base model only):**
 ```bash
-python unsloth_adi.py --inputs path/to/test_data.csv
+python unsloth_adi.py \
+  --inputs path/to/test_data.csv \
+  --model unsloth/qwen3-8b-unsloth-bnb-4bit
+````
+
+**B) Using the public LoRA adapter from the Hub (recommended):**
+
+```bash
+python unsloth_adi.py \
+  --inputs path/to/test_data.csv \
+  --model unsloth/qwen3-8b-unsloth-bnb-4bit \
+  --adapter_repo SisWiss/qwen3-8b-sa-lora \
+  --identifier sa-lora
 ```
 
-**Using a fine-tuned LoRA adapter:**
+Why `--identifier`?
+By default, output directories are named only by the base model. If you evaluate both base-only and base+adapter on the same input file, add `--identifier` to avoid overwriting outputs.
+
+**Output directory for the command above:**
+
+* Defaults to the input CSV’s parent directory, i.e. `path/to/models/`
+* With `--identifier sa-lora`, the final folder becomes:
+
+  * `path/to/models/qwen3-8b-unsloth-bnb-4bit-sa-lora/`
+
+**C) Using a local LoRA adapter directory (e.g., from your own fine-tuning run):**
+
 ```bash
 python unsloth_adi.py \
-    --inputs path/to/test_data.csv \
-    --adapter_dir lora_model_max_steps
+  --inputs path/to/test_data.csv \
+  --model unsloth/qwen3-8b-unsloth-bnb-4bit \
+  --adapter_repo /path/to/lora_adapter_dir \
+  --identifier local-adapter
 ```
 
-**Using existing pre-trained adapter directories (`qwen3_8b_4bit` or `qwen3_14b_4bit`):**
-```bash
-# Using the Qwen3-8B adapter
-python unsloth_adi.py \
-    --inputs path/to/test_data.csv \
-    --adapter_dir qwen3_8b_4bit
+> Note: `--adapter_repo` accepts either a Hub repo id (e.g. `SisWiss/qwen3-8b-sa-lora`) **or** a local path.
+> (The legacy `--adapter_dir` flag still exists for backward compatibility.)
 
-# Using the Qwen3-14B adapter
+**D) Using a specific checkpoint directory:**
+
+```bash
 python unsloth_adi.py \
-    --inputs path/to/test_data.csv \
-    --adapter_dir qwen3_14b_4bit
+  --inputs path/to/test_data.csv \
+  --checkpoint_path trainer_output_xxx/checkpoint-200
 ```
 
-**Using a specific checkpoint:**
+**E) Using trainer output directory + checkpoint step:**
+
 ```bash
 python unsloth_adi.py \
-    --inputs path/to/test_data.csv \
-    --checkpoint_path trainer_output_xxx/checkpoint-200
+  --inputs path/to/test_data.csv \
+  --trainer_output_dir trainer_output_xxx \
+  --checkpoint_step 200
 ```
 
-**Using trainer output directory and checkpoint step:**
+**F) With custom output directory and identifier:**
+
 ```bash
 python unsloth_adi.py \
-    --inputs path/to/test_data.csv \
-    --trainer_output_dir trainer_output_xxx \
-    --checkpoint_step 200
+  --inputs path/to/test_data.csv \
+  --model unsloth/qwen3-8b-unsloth-bnb-4bit \
+  --adapter_repo SisWiss/qwen3-8b-sa-lora \
+  --output_dir /path/to/output \
+  --identifier experiment1
 ```
 
-**With custom output directory and identifier:**
-```bash
-python unsloth_adi.py \
-    --inputs path/to/test_data.csv \
-    --adapter_dir lora_model_max_steps \
-    --output_dir /path/to/output \
-    --identifier experiment1
-```
+**G) Continue from a specific line (useful for resuming):**
 
-**Continue from a specific line (useful for resuming):**
 ```bash
 python unsloth_adi.py \
-    --inputs path/to/test_data.csv \
-    --adapter_dir lora_model_max_steps \
-    --continue_at 100
+  --inputs path/to/test_data.csv \
+  --model unsloth/qwen3-8b-unsloth-bnb-4bit \
+  --adapter_repo SisWiss/qwen3-8b-sa-lora \
+  --identifier sa-lora \
+  --continue_at 100
 ```
 
 #### Arguments
 
-| Argument | Type | Default | Description |
-|----------|------|---------|-------------|
-| `--inputs` | str | **required** | Path to the input CSV file (test data prepared beforehand) |
-| `--continue_at` | int | `0` | Line number to continue processing from (for resuming) |
-| `--to_drop` | str | `../2025_datasets/0/to_drop.txt` | Path to file containing IDs to exclude |
-| `--model` | str | `unsloth/Qwen3-14B` | Base model name (used if no checkpoint/adapter specified) |
-| `--temperature` | float | `0.6` | Sampling temperature for generation |
-| `--max_new_tokens` | int | `2048` | Maximum number of tokens to generate |
-| `--input_batch_exists` | bool | `False` | Whether the input batch JSONL already exists |
-| `--output_dir` | str | `None` | Custom directory to save outputs (defaults to input file's parent) |
-| `--checkpoint_path` | str | `None` | Path to specific checkpoint directory (e.g., `trainer_output_xxx/checkpoint-200`) |
-| `--trainer_output_dir` | str | `None` | Training output directory containing checkpoints |
-| `--checkpoint_step` | int | `None` | Checkpoint step number (used with `--trainer_output_dir`) |
-| `--adapter_dir` | str | `None` | Directory with LoRA adapters (from fine-tuning) |
-| `--identifier` | str | `None` | Additional identifier for output directory naming |
+| Argument               | Type  | Default                             | Description                                                                                                          |
+| ---------------------- | ----- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `--inputs`             | str   | **required**                        | Path to the input CSV file (test data prepared beforehand)                                                           |
+| `--continue_at`        | int   | `0`                                 | Line number to continue processing from (for resuming)                                                               |
+| `--to_drop`            | str   | `../2025_datasets/0/to_drop.txt`    | Path to file containing IDs to exclude                                                                               |
+| `--model`              | str   | `unsloth/qwen3-8b-unsloth-bnb-4bit` | **Base model id** to load (used unless a full checkpoint is loaded)                                                  |
+| `--adapter_repo`       | str   | `None`                              | LoRA adapter source: either a **HF Hub repo id** (e.g., `SisWiss/qwen3-8b-sa-lora`) or a **local adapter directory** |
+| `--temperature`        | float | `0.6`                               | Sampling temperature for generation                                                                                  |
+| `--max_new_tokens`     | int   | `2048`                              | Maximum number of tokens to generate                                                                                 |
+| `--input_batch_exists` | bool  | `False`                             | Whether the input batch JSONL already exists                                                                         |
+| `--output_dir`         | str   | `None`                              | Custom directory to save outputs (defaults to input file's parent)                                                   |
+| `--checkpoint_path`    | str   | `None`                              | Path to a specific checkpoint directory (e.g., `trainer_output_xxx/checkpoint-200`)                                  |
+| `--trainer_output_dir` | str   | `None`                              | Training output directory containing checkpoints                                                                     |
+| `--checkpoint_step`    | int   | `None`                              | Checkpoint step number (used with `--trainer_output_dir`)                                                            |
+| `--adapter_dir`        | str   | `None`                              | Legacy: local directory with LoRA adapters (prefer `--adapter_repo`)                                                 |
+| `--identifier`         | str   | `None`                              | Additional identifier appended to the output directory name (recommended when comparing runs)                        |
 
 #### Model Loading Priority
 
 The script loads models in the following priority order:
+
 1. `--checkpoint_path` (if specified)
 2. `--trainer_output_dir` + `--checkpoint_step` (if both specified)
-3. `--adapter_dir` (if specified)
-4. `--model` (base model, default)
+3. Base model `--model`, then attach adapter from:
+
+   * `--adapter_repo` (Hub id or local path), otherwise
+   * `--adapter_dir` (legacy local path)
+4. `--model` only (base model)
 
 #### Output
 
 The script creates output files in `{output_dir}/models/{model_name}/`:
-- `batch_input.jsonl`: Preprocessed input data
-- `batch_output.jsonl`: Raw model outputs
-- `batch_output.csv`: Clean output CSV (if processed)
 
-The model name is automatically constructed based on:
-- Base model name
-- Checkpoint step (if using checkpoints)
-- Identifier (if provided)
+* `batch_input.jsonl`: preprocessed input data
+* `batch_output.jsonl`: raw model outputs
+* `batch_output.csv`: clean output CSV (if you post-process it)
+
+The `model_name` is constructed from:
+
+* base model name (e.g., `qwen3-8b-unsloth-bnb-4bit`)
+* checkpoint step (if using checkpoints)
+* `--identifier` (if provided)
 
 ---
 
