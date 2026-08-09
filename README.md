@@ -3,7 +3,7 @@
 This repository contains the scripts for fine-tuning and running inference with Qwen3 models using Unsloth used in the AISTATS 2026 publication "Towards Sensitivity-Aware Language Models".
 
 > [!NOTE]
-> We are in the midst of uploading the LoRA adapters and SFT training data. Feel free to reach out to us in case you need it right away! We will adapt the instructions and relevant portions of the code once everything is set up.
+Feel free to reach out to us if you have any issues with the codebase. We'll happily provide you with our local setup and files.
 
 ## Prerequisites
 
